@@ -29,27 +29,27 @@ Wordle is constantly changing their list of words. Without any form of API, it i
 
 # Class Diagrams
 
-![UML Class Diagram](uml.jpeg)
+![UML Class Diagram](resources/images/uml.jpeg)
 
 # Flow Diagrams
 
 ## GUI Flow Diagram
 
-![GUI Flow Diagram](guiflow.png)
+![GUI Flow Diagram](resources/images/guiflow.png)
 
 ## File Flow Diagram
 
-![File Flow Diagram](fileflow.png)
+![File Flow Diagram](resources/images/fileflow.png)
 
 ## Data Flow Diagram
 
-![Data Flow Diagram](dataflow.png)
+![Data Flow Diagram](resources/images/dataflow.png)
 
 # Project Setup
 
 ## GitHub Repository
 
-![GitHub Initial Setup](githubsetup.png)
+![GitHub Initial Setup](resources/images/githubsetup.png)
 
 ## Bare-bones setup
 
