@@ -49,9 +49,9 @@ Wordle is constantly changing their list of words. Without any form of API, it i
 
 ## GitHub Repository
 
-![GitHub Initial Setup](resources/images/githubsetup.png)
-
 ## Bare-bones setup
+
+Hello?
 
 # Research
 

@@ -66,6 +66,11 @@ Wordle is constantly changing their list of words. Without any form of API, it i
 
 ## Bare-bones setup
 
+``` python
+for x in y:
+   print(x)
+```
+
 # Research
 
 # The End
