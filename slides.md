@@ -1,3 +1,16 @@
+---
+title:
+- Project Update
+author:
+- Renn Gilbert
+theme:
+- Frankfurt
+institute:
+- "CSC1061: Computer Science II"
+date:
+- March 28, 2024
+---
+
 # Requirements
 
 1. The project shall only allow the user to guess 5 letter words.
