@@ -25,7 +25,7 @@ $$\downarrow$$
 
 ### Why?
 
-Wordle is constantly changing their list of words. Without any form of API, it is unrealistic to try to keep up with their changes.
+After the New York Times bought Wordle, they switched the word lists many times. Now, they are curating a word each day.
 
 # Class Diagrams
 
@@ -49,12 +49,62 @@ Wordle is constantly changing their list of words. Without any form of API, it i
 
 ## GitHub Repository
 
+![GitHub Initial Setup](resources/images/githubsetup.png)
+
 ## Bare-bones setup
 
-Hello?
+![Bare-bones project setup with VSCode](resources/images/barebones.png)
 
 # Research
 
+## Compiling Word Lists
+
+For my research, I decided to compile my list of words and solutions.
+
+### dictionary.txt
+
+To compile `dictionary.txt`, a list of valid words, I manually scraped the data from the official Wordle valid word list. [Link](https://www.nytimes.com/games-assets/v2/9658.3bcb7e7ddeaadc9414c7.js). The resulting list is over 14,000 words long.
+
+### solutions.txt
+
+To compile `solutions.txt`, a sequential list of upcoming solutions, I used [FrequencyWords](https://github.com/hermitdave/FrequencyWords/tree/master), a GitHub repository with words sorted by their frequency in a corpus (in various languages). I filtered it for words that are in `dictionary.txt`, limited it to the 2,000 most common, and shuffled it.
+
+## Script
+
+![Python script to filter solutions](resources/images/script.png)
+
+## Sample Data
+
+### dictionary.txt
+
+```
+aahed
+aalii
+aapas
+aargh
+aarti
+abaca
+abaci
+abacs
+abaft
+abaht
+```
+
+### solutions.txt
+
+```
+whine
+spell
+saved
+parts
+drank
+sites
+ducky
+fatty
+steak
+stock
+```
+
 # The End
 
-Thank you.
+![NYT Wordle Image](resources/images/nytwordle.jpeg)
