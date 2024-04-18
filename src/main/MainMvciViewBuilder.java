@@ -45,13 +45,13 @@ public class MainMvciViewBuilder implements Builder<Region> {
         unlimitedButton.getStyleClass().addAll(Styles.BUTTON_ICON);
 
         classicButton.setOnAction((event) -> {
-            model.setGameScreenVisible(true);
             model.setGameMode(GameMode.CLASSIC);
+            model.setGameScreenVisible(true);
         });
 
         unlimitedButton.setOnAction((event) -> {
-            model.setGameScreenVisible(true);
             model.setGameMode(GameMode.UNLIMITED);
+            model.setGameScreenVisible(true);
         });
 
         classicButton.setDefaultButton(true);

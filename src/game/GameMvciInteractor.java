@@ -2,7 +2,6 @@ package game;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -11,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import domain.Guess;
 import domain.LetterState;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import main.GameMode;
@@ -23,13 +23,36 @@ public class GameMvciInteractor {
         this.model = model;
         loadDictionary();
         loadSolutions();
-        loadGuesses();
-
-        model.gameModeProperty().addListener((observable, oldGameMode, newGameMode) -> {
-            chooseWord();
-        });
-
+        manageGameOver();
         initKeyboardStateMap();
+
+
+        model.gameScreenVisibleProperty().addListener((observable, wasVisible, isVisible) -> {
+            if (isVisible) {
+                chooseWord();
+                loadGuesses();
+                resetKeyboardStateMap();
+                model.setCurrentGuessIndex(0);
+            }
+        });
+    }
+
+    private void resetKeyboardStateMap() {
+        Map<Character, ObjectProperty<LetterState>> map = model.getKeyboardStateMap();
+        map.forEach((c, objectProperty) -> objectProperty.set(LetterState.WHITE));
+    }
+
+    private void manageGameOver() {
+        model.gameOverProperty().bind(
+            Bindings.createBooleanBinding(()
+                                              -> model.getCurrentGuessIndex() > 5
+                    || (model.getCurrentGuessIndex() > 0
+                        && model.getGuesses()
+                               .get(model.getCurrentGuessIndex() - 1)
+                               .getLetterStates()
+                               .stream()
+                               .allMatch(l -> l == LetterState.GREEN)),
+                model.currentGuessIndexProperty()));
     }
 
     private void initKeyboardStateMap() {
@@ -51,10 +74,10 @@ public class GameMvciInteractor {
             int randomIndex = random.nextInt(solutionCount);
             model.setCorrectWord(model.getSolutions().get(randomIndex));
         }
-        model.setCorrectWord("facet");
     }
 
     private void loadGuesses() {
+        model.getGuesses().clear();
         for (int i = 0; i < 6; i++) {
             model.getGuesses().add(new Guess());
         }
@@ -83,7 +106,7 @@ public class GameMvciInteractor {
     }
 
     public void addLetter(char letter) {
-        if (gameOver()) return;
+        if (model.gameIsOver()) return;
         Guess currentGuess = model.getGuesses().get(model.getCurrentGuessIndex());
         for (int i = 0; i < 5; i++) {
             if (currentGuess.getCharacters().get(i) == ' ') {
@@ -95,7 +118,7 @@ public class GameMvciInteractor {
     }
 
     public void submitGuess() {
-        if (gameOver()) return;
+        if (model.gameIsOver()) return;
         Guess currentGuess = model.getGuesses().get(model.getCurrentGuessIndex());
         String guessWord = charListToString(currentGuess.getCharacters());
 
@@ -146,7 +169,7 @@ public class GameMvciInteractor {
     }
 
     public void removeLetter() {
-        if (gameOver()) return;
+        if (model.gameIsOver()) return;
         Guess currentGuess = model.getGuesses().get(model.getCurrentGuessIndex());
         for (int i = 4; i >= 0; i--) {
             if (currentGuess.getCharacters().get(i) != ' ') {
@@ -154,12 +177,5 @@ public class GameMvciInteractor {
                 return;
             }
         }
-    }
-
-    public boolean gameOver() {
-        return model.getCurrentGuessIndex() > 5
-        || (model.getCurrentGuessIndex() > 1 
-            && model.getGuesses().get(model.getCurrentGuessIndex() - 1)
-            .getLetterStates().stream().allMatch(l -> l == LetterState.GREEN));
     }
 }

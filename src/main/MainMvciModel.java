@@ -9,7 +9,7 @@ import javafx.beans.property.ObjectProperty;
 public class MainMvciModel {
     private final BooleanProperty gameScreenVisible = new SimpleBooleanProperty(false);
     private final ObjectProperty<GameMode> gameMode = new SimpleObjectProperty<>();
-    private final GameMvciController gameMvciController = new GameMvciController(gameModeProperty());
+    private final GameMvciController gameMvciController = new GameMvciController(gameModeProperty(), gameScreenVisible);
 
     public BooleanProperty gameScreenVisibleProperty() {
         return gameScreenVisible;

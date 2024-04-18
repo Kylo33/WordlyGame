@@ -1,14 +1,17 @@
 package game;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignE;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignK;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
 
+import atlantafx.base.controls.Message;
 import atlantafx.base.controls.Notification;
 import atlantafx.base.theme.Styles;
 import atlantafx.base.util.Animations;
@@ -16,6 +19,8 @@ import domain.Guess;
 import domain.LetterState;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
@@ -30,6 +35,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import javafx.util.Builder;
 import javafx.util.Duration;
@@ -51,8 +57,20 @@ public class GameMvciViewBuilder implements Builder<Region> {
     @Override
     public Region build() {
         BorderPane borderPane = new BorderPane();
+
+        Region backButton = createPostGameButtons();
+        BorderPane.setAlignment(backButton, Pos.TOP_RIGHT);
+        BorderPane.setMargin(backButton, new Insets(5));
+        borderPane.setTop(backButton);
         
-        borderPane.setCenter(createBoard());
+        Region board = createBoard();
+        Region revealMessage = createAnswerMessage();
+        revealMessage.minWidthProperty().bind(board.widthProperty());
+        Region successMessage = createSuccessMessage();
+        successMessage.minWidthProperty().bind(board.widthProperty());
+        VBox centerBox = new VBox(10, encapsulateInHBox(revealMessage), encapsulateInHBox(successMessage), encapsulateInHBox(board));
+        centerBox.setAlignment(Pos.CENTER);
+        borderPane.setCenter(centerBox);
 
         Region keyboardDisplay = createKeyboardDisplay();
         borderPane.setBottom(keyboardDisplay);
@@ -63,6 +81,57 @@ public class GameMvciViewBuilder implements Builder<Region> {
         addKeyboardEvents(result);
         addPopups(result);
 
+        return result;
+    }
+
+    private Node encapsulateInHBox(Region region) {
+        HBox result = new HBox(region);
+        result.setAlignment(Pos.CENTER);
+        result.visibleProperty().bind(region.visibleProperty());
+        return result;
+    }
+
+    private Region createAnswerMessage() {
+        Message message = new Message();
+        message.setTitle("Answer");
+        message.descriptionProperty().bind(model.correctWordProperty());
+        message.setGraphic(new FontIcon(MaterialDesignL.LIGHTBULB_ON_OUTLINE));
+        
+        message.getStyleClass().addAll(Styles.ACCENT);
+        message.visibleProperty().bind(Bindings.createBooleanBinding(() -> model.gameIsOver() && model.getCurrentGuessIndex() > 0 && !lastGuessWasCorrect(), model.gameOverProperty()));
+        return message;
+    }
+
+    private Region createSuccessMessage() {
+        Message message = new Message();
+        message.setTitle("Correct!");
+        message.setGraphic(new FontIcon(MaterialDesignP.PARTY_POPPER));
+        
+        message.getStyleClass().addAll(Styles.SUCCESS);
+        message.visibleProperty().bind(Bindings.createBooleanBinding(() -> model.gameIsOver() && model.getCurrentGuessIndex() > 0 && lastGuessWasCorrect(), model.gameOverProperty()));
+        return message;
+    }
+
+    private boolean lastGuessWasCorrect() {
+        return model.getGuesses().get(model.getCurrentGuessIndex() - 1).getLetterStates().stream().allMatch(ls -> ls == LetterState.GREEN);
+    }
+
+    private Region createPostGameButtons() {
+        Button backButton = new Button("", new FontIcon(MaterialDesignE.EXIT_TO_APP));
+        backButton.getStyleClass().add(Styles.BUTTON_ICON);
+        backButton.visibleProperty().bind(model.gameOverProperty());
+        backButton.setFocusTraversable(false);
+
+        backButton.setOnAction((event) -> model.setGameScreenVisible(false));
+
+        Button statsButton = new Button("", new FontIcon(MaterialDesignC.CHART_BAR));
+        statsButton.getStyleClass().add(Styles.BUTTON_ICON);
+        BorderPane.setAlignment(statsButton, Pos.TOP_RIGHT);
+        statsButton.visibleProperty().bind(model.gameOverProperty());
+        statsButton.setFocusTraversable(false);
+
+        HBox result = new HBox(5, backButton, statsButton);
+        result.setAlignment(Pos.CENTER_RIGHT);
         return result;
     }
 
@@ -112,10 +181,8 @@ public class GameMvciViewBuilder implements Builder<Region> {
         result.setHgap(5);
         result.setVgap(5);
 
-        fillBoard(result);
         model.getGuesses().addListener((ListChangeListener<? super Guess>) change -> {
             while (change.next()) {
-                result.getChildren().clear();
                 fillBoard(result);
             }
         });
@@ -125,17 +192,19 @@ public class GameMvciViewBuilder implements Builder<Region> {
     }
 
     private void fillBoard(GridPane result) {
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 6; j++) {
-                Label box = new Label(String.valueOf(model.getGuesses().get(j).getCharacters().get(i)));
+        result.getChildren().clear();
+
+        for (int i = 0; i < model.getGuesses().size(); i++) {
+            for (int j = 0; j < 5; j++) {
+                Label box = new Label(String.valueOf(model.getGuesses().get(i).getCharacters().get(j)));
                 box.getStyleClass().add(Styles.TITLE_1);
 
-                String color = String.valueOf(model.getGuesses().get(j).getLetterStates().get(i));
+                String color = String.valueOf(model.getGuesses().get(i).getLetterStates().get(j));
 
                 box.setStyle("-fx-background-color:" + color + "; -fx-text-fill: white;");
                 box.setPrefSize(50, 50);
                 box.setAlignment(Pos.CENTER);
-                result.add(box, i, j);
+                result.add(box, j, i);
             }
         }
     }
@@ -158,7 +227,12 @@ public class GameMvciViewBuilder implements Builder<Region> {
                 ObjectProperty<LetterState> state = model.getKeyboardStateMap().get(c);
                 b.setStyle("-fx-background-color:" + state.get() + ";-fx-font-weight: bold;");
                 state.addListener((observable, oldLetterState, newLetterState) -> {
-                    b.setStyle("-fx-background-color:" + newLetterState + "; -fx-text-fill: white; -fx-font-weight: bold;");
+                    StringBuilder styleString = new StringBuilder("-fx-background-color:");
+                    styleString.append(newLetterState.toString());
+                    styleString.append("; -fx-text-fill: ");
+                    styleString.append(newLetterState == LetterState.WHITE ? "black" : "white");
+                    styleString.append("; -fx-font-weight: bold;");
+                    b.setStyle(styleString.toString());
                 });
 
                 b.setFocusTraversable(false);

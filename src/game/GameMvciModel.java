@@ -11,7 +11,9 @@ import domain.Guess;
 import domain.LetterState;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -38,6 +40,10 @@ public class GameMvciModel {
     private final StringProperty correctWord = new SimpleStringProperty();
 
     private final NotificationSystem notificationSystem = new NotificationSystem();
+
+    private final BooleanProperty gameOver = new SimpleBooleanProperty();
+
+    private final BooleanProperty gameScreenVisible = new SimpleBooleanProperty();
 
     public GameMode getGameMode() {
         return gameMode.get();
@@ -93,5 +99,29 @@ public class GameMvciModel {
 
     public NotificationSystem getNotificationSystem() {
         return notificationSystem;
+    }
+
+    public boolean gameIsOver() {
+        return gameOver.get();
+    }
+
+    public BooleanProperty gameOverProperty() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean v) {
+        gameOver.set(v);
+    }
+
+    public boolean getGameScreenVisible() {
+        return gameScreenVisible.get();
+    }
+
+    public BooleanProperty gameScreenVisibleProperty() {
+        return gameScreenVisible;
+    }
+
+    public void setGameScreenVisible(boolean v) {
+        gameScreenVisible.set(v);
     }
 }
