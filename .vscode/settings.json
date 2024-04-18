@@ -5,6 +5,10 @@
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "/home/renn/JavaFX/javafx-sdk-21.0.2/lib/*"
+        "/home/renn/JavaFX/javafx-sdk-22/lib/*",
+        "/home/renn/Downloads/atlantafx-base-2.0.1.jar",
+        "/home/renn/Downloads/ikonli-javafx-12.3.1.jar",
+        "/home/renn/Downloads/ikonli-materialdesign2-pack-12.3.1.jar",
+        "/home/renn/Downloads/ikonli-core-12.3.1.jar"
     ]
 }

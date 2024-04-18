@@ -1,3 +1,4 @@
+import atlantafx.base.theme.PrimerLight;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -9,7 +10,9 @@ public class App extends Application{
 
     @Override
     public void start(Stage stage) {
-        stage.setScene(new Scene(controller.getView()));
+        Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+
+        stage.setScene(new Scene(controller.getView(), 800, 400));
         stage.setTitle("WordlyGame");
         stage.show();
     }

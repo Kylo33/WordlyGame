@@ -1,0 +1,5 @@
+ikonli-materialdesign2-pack
+atlantafx-base
+ikonli-javafx
+javafx
+ikonli-core
