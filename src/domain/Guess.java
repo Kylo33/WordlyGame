@@ -1,13 +1,7 @@
 package domain;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -21,32 +15,39 @@ public class Guess {
     public Guess() {
         for (int i = 0; i < 5; i++) {
             characters.add(' ');
-            letterStates.add(LetterState.GRAY);
+            letterStates.add(LetterState.WHITE);
         }
     }
 
     public void check(String correctWord) {
 
-        Map<Character, Integer> map = new HashMap<>();
+        Map<Character, Integer> frequencyMap = new HashMap<>();
         for (int i = 0; i < 5; i++) {
-            if (correctWord.contains(String.valueOf(characters.get(i)))) {
-                map.put(characters.get(i), map.getOrDefault(i, 0) + 1);
-            }
+            frequencyMap.put(Character.toLowerCase(correctWord.charAt(i)), 
+                frequencyMap.getOrDefault(Character.toLowerCase(correctWord.charAt(i)), 0) + 1);
         }
 
         for (int i = 0; i < 5; i++) {
-            if (correctWord.charAt(i) == characters.get(i).charValue()) {
+            char c = Character.toLowerCase(characters.get(i));
+            if (correctWord.charAt(i) == c) {
                 letterStates.set(i, LetterState.GREEN);
-                if (map.containsKey(characters.get(i))) {
-                    map.put(characters.get(i), map.get(characters.get(i)) - 1);
+                if (frequencyMap.containsKey(c)) {
+                    frequencyMap.put(c, frequencyMap.get(c) - 1);
                 }
             }
         }
 
         for (int i = 0; i < 5; i++) {
-            if (letterStates.get(i) != LetterState.GREEN && map.getOrDefault(characters.get(i), 0) > 0) {
+            char c = Character.toLowerCase(characters.get(i));
+            if (letterStates.get(i) != LetterState.GREEN && frequencyMap.getOrDefault(c, 0) > 0) {
                 letterStates.set(i, LetterState.YELLOW);
-                map.put(characters.get(i), map.get(characters.get(i))-1);
+                frequencyMap.put(c, frequencyMap.get(c)-1);
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            if (letterStates.get(i) == LetterState.WHITE) {
+                letterStates.set(i, LetterState.GRAY);
             }
         }
 

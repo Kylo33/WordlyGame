@@ -1,7 +1,7 @@
 package domain;
 
 public enum LetterState {
-    GREEN("green"), YELLOW("goldenrod"), GRAY("grey");
+    GREEN("green"), YELLOW("goldenrod"), GRAY("grey"), WHITE("lightgrey");
 
     private String name;
 

@@ -2,18 +2,56 @@ package game;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import domain.Guess;
+import domain.LetterState;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import main.GameMode;
 
 public class GameMvciInteractor {
     private final GameMvciModel model;
+    private static final Random random = new Random();
 
     public GameMvciInteractor(GameMvciModel model) {
         this.model = model;
         loadDictionary();
         loadSolutions();
         loadGuesses();
+
+        model.gameModeProperty().addListener((observable, oldGameMode, newGameMode) -> {
+            chooseWord();
+        });
+
+        initKeyboardStateMap();
+    }
+
+    private void initKeyboardStateMap() {
+        Map<Character, ObjectProperty<LetterState>> map = model.getKeyboardStateMap();
+        for (char[] row: GameMvciModel.KEYBOARD_CHARS) {
+            for (char c: row) {
+                map.put(c, new SimpleObjectProperty<>(LetterState.WHITE));
+            }
+        }
+    }
+
+    private void chooseWord() {
+        int solutionCount = model.getSolutions().size();
+        if (model.getGameMode() == GameMode.CLASSIC) {
+            long days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis());
+            int daysWrapped = (int) (days % solutionCount);
+            model.setCorrectWord(model.getSolutions().get(daysWrapped));
+        } else if (model.getGameMode() == GameMode.UNLIMITED) {
+            int randomIndex = random.nextInt(solutionCount);
+            model.setCorrectWord(model.getSolutions().get(randomIndex));
+        }
+        model.setCorrectWord("facet");
     }
 
     private void loadGuesses() {
@@ -42,5 +80,86 @@ public class GameMvciInteractor {
         } catch (FileNotFoundException exception) {
             throw new RuntimeException("Solutions.txt was not found.");
         }
+    }
+
+    public void addLetter(char letter) {
+        if (gameOver()) return;
+        Guess currentGuess = model.getGuesses().get(model.getCurrentGuessIndex());
+        for (int i = 0; i < 5; i++) {
+            if (currentGuess.getCharacters().get(i) == ' ') {
+                currentGuess.getCharacters().set(i, letter);
+                return;
+            }
+        }
+        
+    }
+
+    public void submitGuess() {
+        if (gameOver()) return;
+        Guess currentGuess = model.getGuesses().get(model.getCurrentGuessIndex());
+        String guessWord = charListToString(currentGuess.getCharacters());
+
+        if (currentGuess.getCharacters().stream().anyMatch(c -> c == ' ')) {
+            model.getNotificationSystem().sendMessage("Not enough letters");
+            return;
+        };
+        
+        if (!model.getDictionary().contains(guessWord.toLowerCase())) {
+            model.getNotificationSystem().sendMessage("Not in word list");
+            return;
+        };
+
+        currentGuess.check(model.getCorrectWord());
+        updateKeyboard(currentGuess);
+        
+        model.setCurrentGuessIndex(model.getCurrentGuessIndex() + 1);
+        return;
+    }
+
+    private String charListToString(List<Character> characters) {
+        StringBuilder builder = new StringBuilder();
+        for(char c: characters) {
+            builder.append(c);
+        }
+        return builder.toString();
+    }
+
+    private void updateKeyboard(Guess currentGuess) {
+        Map<Character, ObjectProperty<LetterState>> map = model.getKeyboardStateMap();
+        
+        // add green and gray letters
+
+        for (int i = 0; i < 5; i++) {
+            char c = Character.toUpperCase(currentGuess.getCharacters().get(i));
+            LetterState ls = currentGuess.getLetterStates().get(i);
+            if (ls == LetterState.GREEN || ls == LetterState.GRAY)
+                map.get(c).set(ls);
+        }
+
+        // for yellow letters, put them as yellow if they are not already green
+        for (int i = 0; i < 5; i++) {
+            char c = Character.toUpperCase(currentGuess.getCharacters().get(i));
+            LetterState ls = currentGuess.getLetterStates().get(i);
+            if (ls == LetterState.YELLOW && map.get(c).get() != LetterState.GREEN)
+                map.get(c).set(ls);
+        }
+    }
+
+    public void removeLetter() {
+        if (gameOver()) return;
+        Guess currentGuess = model.getGuesses().get(model.getCurrentGuessIndex());
+        for (int i = 4; i >= 0; i--) {
+            if (currentGuess.getCharacters().get(i) != ' ') {
+                currentGuess.getCharacters().set(i, ' ');
+                return;
+            }
+        }
+    }
+
+    public boolean gameOver() {
+        return model.getCurrentGuessIndex() > 5
+        || (model.getCurrentGuessIndex() > 1 
+            && model.getGuesses().get(model.getCurrentGuessIndex() - 1)
+            .getLetterStates().stream().allMatch(l -> l == LetterState.GREEN));
     }
 }
