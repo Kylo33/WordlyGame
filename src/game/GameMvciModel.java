@@ -1,5 +1,6 @@
 package game;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,8 +43,9 @@ public class GameMvciModel {
     private final NotificationSystem notificationSystem = new NotificationSystem();
 
     private final BooleanProperty gameOver = new SimpleBooleanProperty();
-
     private final BooleanProperty gameScreenVisible = new SimpleBooleanProperty();
+
+    private final StatsManager statsManager = new StatsManager(new File("resources/stats/statistics.txt"));
 
     public GameMode getGameMode() {
         return gameMode.get();
@@ -123,5 +125,9 @@ public class GameMvciModel {
 
     public void setGameScreenVisible(boolean v) {
         gameScreenVisible.set(v);
+    }
+
+    public StatsManager getStatsManager() {
+        return statsManager;
     }
 }

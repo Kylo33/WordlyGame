@@ -136,7 +136,10 @@ public class GameMvciInteractor {
         updateKeyboard(currentGuess);
         
         model.setCurrentGuessIndex(model.getCurrentGuessIndex() + 1);
-        return;
+
+        if (model.gameIsOver()) {
+            model.getStatsManager().addStat(model.getCurrentGuessIndex());
+        }
     }
 
     private String charListToString(List<Character> characters) {

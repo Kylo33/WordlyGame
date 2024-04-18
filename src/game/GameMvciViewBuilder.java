@@ -13,6 +13,9 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
 
 import atlantafx.base.controls.Message;
 import atlantafx.base.controls.Notification;
+import atlantafx.base.controls.Popover;
+import atlantafx.base.controls.Tile;
+import atlantafx.base.controls.Popover.ArrowLocation;
 import atlantafx.base.theme.Styles;
 import atlantafx.base.util.Animations;
 import domain.Guess;
@@ -26,16 +29,25 @@ import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.util.Builder;
 import javafx.util.Duration;
@@ -129,10 +141,64 @@ public class GameMvciViewBuilder implements Builder<Region> {
         BorderPane.setAlignment(statsButton, Pos.TOP_RIGHT);
         statsButton.visibleProperty().bind(model.gameOverProperty());
         statsButton.setFocusTraversable(false);
+        statsButton.setOnAction(c -> {
+            showStatsStage();
+        });
+
+        model.gameOverProperty().addListener((observable, oldValue, newValue)-> {
+            if (newValue) {
+                Popover popover = new Popover(new Label("Click to view your stats!", new FontIcon(MaterialDesignC.CURSOR_DEFAULT_CLICK)));
+                popover.setArrowLocation(ArrowLocation.TOP_RIGHT);
+                popover.setDetachable(true);
+                popover.show(statsButton);
+            }
+        });
 
         HBox result = new HBox(5, backButton, statsButton);
         result.setAlignment(Pos.CENTER_RIGHT);
         return result;
+    }
+
+    private void showStatsStage() {
+        Stage stage = new Stage();
+        stage.setTitle("WordlyGame Statistics");
+        BorderPane root = new BorderPane();
+
+        Message winPercent = new Message("Win Rate", model.getStatsManager().getWinPercent() + "%", new FontIcon(MaterialDesignP.PERCENT));
+        Message gamesPlayed = new Message("Games Played", String.valueOf(model.getStatsManager().getGamesPlayed()), new FontIcon(MaterialDesignC.CONTROLLER_CLASSIC));
+
+        GridPane gridPane = new GridPane();
+        ColumnConstraints cc = new ColumnConstraints();
+        cc.setPercentWidth(50);
+        gridPane.getColumnConstraints().add(cc);
+        gridPane.add(winPercent, 0, 0);
+        gridPane.add(gamesPlayed, 1, 0);
+        gridPane.getChildren().forEach(child -> GridPane.setHgrow(child, Priority.ALWAYS));
+        gridPane.setHgap(10);
+        gridPane.setPadding(new Insets(10));
+        root.setTop(gridPane);
+
+        CategoryAxis numOfGuesses = new CategoryAxis();
+        NumberAxis distributionOfGuessCount = new NumberAxis();
+
+        var data = new XYChart.Series<Number, String>();
+
+        var freqList = model.getStatsManager().getGuessFrequencyList();
+        for (int i = 0, c = freqList.size() - 1; i < c; i++) {
+            data.getData().add(new XYChart.Data<>(freqList.get(i), String.valueOf(i)));
+        }
+
+        BarChart<Number, String> chart = new BarChart<Number, String>(distributionOfGuessCount, numOfGuesses);
+        chart.setTitle("Guess Distribution");
+        chart.getData().add(data);
+
+        chart.setLegendVisible(false);
+        root.setCenter(chart);
+
+        chart.setHorizontalGridLinesVisible(false);
+
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
     private void addPopups(StackPane result) {
