@@ -1,13 +1,8 @@
 package org.renn.game;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import javafx.beans.binding.Bindings;
@@ -69,7 +64,8 @@ public class GameMvciInteractor {
     private void chooseWord() {
         int solutionCount = model.getSolutions().size();
         if (model.getGameMode() == GameMode.CLASSIC) {
-            long days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis());
+            long ms = Calendar.getInstance(TimeZone.getDefault()).getTimeInMillis();
+            long days = TimeUnit.MILLISECONDS.toDays(ms);
             int daysWrapped = (int) (days % solutionCount);
             model.setCorrectWord(model.getSolutions().get(daysWrapped));
         } else if (model.getGameMode() == GameMode.UNLIMITED) {
