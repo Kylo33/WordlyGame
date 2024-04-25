@@ -6,16 +6,9 @@
     "configurations": [
         {
             "type": "java",
-            "name": "StatsManager",
+            "name": "Main",
             "request": "launch",
-            "mainClass": "game.StatsManager",
-            "projectName": "WordlyGame_e84077c5"
-        },
-        {
-            "type": "java",
-            "name": "Guess",
-            "request": "launch",
-            "mainClass": "domain.Guess",
+            "mainClass": "Main",
             "projectName": "WordlyGame_e84077c5"
         },
         {

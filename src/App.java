@@ -12,7 +12,7 @@ public class App extends Application{
     public void start(Stage stage) {
         Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 
-        stage.setScene(new Scene(controller.getView(), 800, 400));
+        stage.setScene(new Scene(controller.getView(), 1280, 720));
         stage.setTitle("WordlyGame");
         stage.show();
     }

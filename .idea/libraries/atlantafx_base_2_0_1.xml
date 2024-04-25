@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="atlantafx-base-2.0.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/jar/atlantafx-base-2.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/ikonli-core-12.3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/ikonli-javafx-12.3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/ikonli-materialdesign2-pack-12.3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/javafx-swt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/javafx.base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/javafx.controls.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/javafx.fxml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/javafx.graphics.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/javafx.media.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/javafx.swing.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar/javafx.web.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
