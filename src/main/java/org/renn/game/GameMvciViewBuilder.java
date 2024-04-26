@@ -83,7 +83,7 @@ public class GameMvciViewBuilder implements Builder<Region> {
         revealMessage.minWidthProperty().bind(board.widthProperty());
         Region successMessage = createSuccessMessage();
         successMessage.minWidthProperty().bind(board.widthProperty());
-        VBox centerBox = new VBox(10, encapsulateInHBox(revealMessage), encapsulateInHBox(successMessage), encapsulateInHBox(board));
+        VBox centerBox = new VBox(10, new StackPane(encapsulateInHBox(revealMessage), encapsulateInHBox(successMessage)), encapsulateInHBox(board));
         centerBox.setAlignment(Pos.CENTER);
         borderPane.setCenter(centerBox);
 
